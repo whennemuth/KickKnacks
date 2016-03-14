@@ -1,4 +1,4 @@
-package com.bu.ist.knickknacks;
+package com.warren.knickknacks.bu.ist.kc.sql;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
