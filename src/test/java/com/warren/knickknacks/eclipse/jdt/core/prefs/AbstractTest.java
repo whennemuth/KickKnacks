@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 import org.mockito.Mockito;
 
+import com.warren.knickknacks.Util;
+
 public abstract class AbstractTest {
 
 	public File configureFile(String pathname, File f) {
@@ -57,7 +59,7 @@ public abstract class AbstractTest {
 		}
 		else {
 			File parentFile = Mockito.mock(File.class);		
-			String parent = concat(index, "/", parts);
+			String parent = Util.concat(index, "/", parts);
 			parentFile = configureDirectory(parent, parentFile, indent+1);
 			when(f.getParent()).thenReturn(parent);
 			s.append(getIndent(indent)).append("getParent").append(" = " + parent).append("\r\n");
@@ -72,21 +74,6 @@ public abstract class AbstractTest {
 		}
 		when(f.toString()).thenReturn(s.toString());
 		return f;
-	}
-	
-	public String concat(int end, String concat, String[] a) {
-		return concat(0, end, concat, a);
-	}
-		
-	public String concat(int begin, int end, String concat, String[] a) {
-		StringBuilder s = new StringBuilder();
-		for(int i=begin; i<= end; i++) {
-			s.append(a[i]);
-			if(i < end) {
-				s.append(concat);
-			}
-		}
-		return s.toString();
 	}
 	
 	private String getIndent(int indent) {

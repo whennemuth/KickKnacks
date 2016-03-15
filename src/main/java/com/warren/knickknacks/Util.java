@@ -1,4 +1,4 @@
-package com.warren.knickknacks.bu.ist.kc.sql;
+package com.warren.knickknacks;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -113,7 +113,19 @@ public class Util {
 		}		
 	}
 	
-	
-	
+	public static String concat(int end, String concat, String[] a) {
+		return concat(0, end, concat, a);
+	}
+		
+	public static String concat(int begin, int end, String concat, String[] a) {
+		StringBuilder s = new StringBuilder();
+		for(int i=begin; i<= end; i++) {
+			s.append(a[i]);
+			if(i < end) {
+				s.append(concat);
+			}
+		}
+		return s.toString();
+	}
 	
 }

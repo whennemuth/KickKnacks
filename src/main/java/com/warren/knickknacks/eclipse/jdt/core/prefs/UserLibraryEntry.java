@@ -3,7 +3,9 @@ package com.warren.knickknacks.eclipse.jdt.core.prefs;
 import java.io.File;
 import java.util.List;
 
-public class UserLibraryEntry extends AbstractTest {
+import com.warren.knickknacks.Util;
+
+public class UserLibraryEntry {
 
 	private List<File> items;
 	
@@ -19,6 +21,10 @@ public class UserLibraryEntry extends AbstractTest {
 	 * @return
 	 */
 	public String getPrefsFileLine(String libName) {
+		if(items == null || items.isEmpty()) {
+			return "";
+		}
+		
 		StringBuilder s = new StringBuilder("org.eclipse.jdt.core.userLibrary.")
 				.append(libName)
 				.append("=<?xml version\\=\"1.0\" encoding\\=\"UTF-8\"?>\\r\\n")
@@ -45,7 +51,7 @@ public class UserLibraryEntry extends AbstractTest {
 		String[] parts = path.split("[\\\\/:]+");
 		StringBuilder s = new StringBuilder();
 		s.append(parts[0].toUpperCase()).append("\\:");
-		String reassembled = concat(1, parts.length-1, "/", parts);
+		String reassembled = Util.concat(1, parts.length-1, "/", parts);
 		s.append("/").append(reassembled);
 		return s.toString();
 	}
