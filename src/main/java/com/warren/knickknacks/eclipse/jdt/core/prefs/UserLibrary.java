@@ -9,6 +9,13 @@ import java.util.regex.Matcher;
 
 import com.warren.knickknacks.eclipse.jdt.core.prefs.UserLibraryMerger.ItemType;
 
+/**
+ * This class represents an user library as you would to an eclipse workspace for use by projects to add to their 
+ * build paths, debug configurations, etc.
+ * 
+ * @author wrh
+ *
+ */
 public class UserLibrary {
 	
 	public static final String ECLIPSE_SETTINGS_FILE = 
@@ -24,39 +31,33 @@ public class UserLibrary {
 		}
 
 		UserLibrary jarLib = getInstance(parms.getJarParms());
-		UserLibraryMerger merger = new UserLibraryMerger(jarLib);
+		UserLibraryMerger merger = UserLibraryMerger.getInstance(jarLib, null);
 		
 		if(parms.getSrcJarParms() != null) {
+			merger = UserLibraryMerger.getInstance(merger.getMergedLib(), ItemType.SRC_JAR);
 			UserLibrary srcJarLib = getInstance(parms.getSrcJarParms());
-			merger.merge(srcJarLib, ItemType.SRC_JAR);
+			merger.merge(srcJarLib);
 		}
 		
 		if(parms.getJavaDocParms() != null) {
+			merger = UserLibraryMerger.getInstance(merger.getMergedLib(), ItemType.JAVADOC);
 			UserLibrary javaDocLib = getInstance(parms.getJavaDocParms());
-			merger.merge(javaDocLib, ItemType.JAVADOC);
+			merger.merge(javaDocLib);
 		}
 		
 		if(parms.getNativeLibraryParms() != null) {
+			merger = UserLibraryMerger.getInstance(merger.getMergedLib(), ItemType.NATIVE_LIB);
 			UserLibrary nativeLibLib = getInstance(parms.getNativeLibraryParms());
-			merger.merge(nativeLibLib, ItemType.NATIVE_LIB);
+			merger.merge(nativeLibLib);
 		}
 		
 		if(parms.getAccessRulesParms() != null) {
+			merger = UserLibraryMerger.getInstance(merger.getMergedLib(), ItemType.ACCESS_RULES);
 			UserLibrary accessRulesLib = getInstance(parms.getAccessRulesParms());
-			merger.merge(accessRulesLib, ItemType.ACCESS_RULES);
+			merger.merge(accessRulesLib);
 		}
 
 		return merger.getMergedLib();
-	}
-	
-	public static UserLibrary getInstanceForJars(UserLibraryMemberItemSearchParms parms) {
-		parms.setRegex(".*\\.jar");
-		return getInstance(parms);
-	}
-	
-	public static UserLibrary getInstanceForSourceJars(UserLibraryMemberItemSearchParms parms) {
-		parms.setRegex(".*\\-((source)|(sources)|(src)\\.jar");
-		return getInstance(parms);
 	}
 		
 	public static UserLibrary getInstance(final UserLibraryMemberItemSearchParms parms) {
@@ -64,7 +65,7 @@ public class UserLibrary {
 			throw new IllegalArgumentException(parms.getValidationMessage());
 		
 		UserLibrary lib = new UserLibrary();
-		lib.parms = parms;
+		lib.parms = parms; 
 		lib.build(parms.getRootDir(), new FileFilter(){
 			public boolean accept(File pathname) {
 				if(parms.getIncludeSubDirs() && pathname.isDirectory())
@@ -88,6 +89,7 @@ public class UserLibrary {
 			else {
 				UserLibraryMember member = new UserLibraryMember();
 				member.setJar(f);
+				member.setParent(this);
 				libMembers.add(member);
 			}
 		}
@@ -148,23 +150,38 @@ public class UserLibrary {
 	public static void main(String[] args) throws Exception {
 		System.out.println("START!");
 		
-		UserLibraryMemberItemSearchParms parms = new UserLibraryMemberItemSearchParms();
-		parms.setWorkspaceDir("C:/whennemuth/workspaces/kuali_workspace");
-		parms.setRootDir("C:/Users/wrh/.m2/repository/org/kuali/rice");
-		parms.setLibName("RICE_SOURCE_LIB_2.5.3.1509.0002");
-		parms.setRegex(".*2\\.5\\.3\\.1509\\.0002\\-kualico\\-source(s)?.jar");
-		parms.setIncludeSubDirs(true);
+		UserLibraryMemberSearchParms parms = new UserLibraryMemberSearchParms();
+		
+		UserLibraryMemberItemSearchParms jarParms = new UserLibraryMemberItemSearchParms();
+		jarParms.setWorkspaceDir("C:/whennemuth/workspaces/kuali_workspace");
+		jarParms.setRootDir("C:/Users/wrh/.m2/repository/org/kuali/rice");
+		jarParms.setLibName("RICE_SOURCE_LIB_2.5.3.1509.0002");
+		jarParms.setRegex(".*2\\.5\\.3\\.1509\\.0002\\-kualico\\.jar");
+		jarParms.setIncludeSubDirs(true);
+		parms.setJarParms(jarParms);
+		
+		UserLibraryMemberItemSearchParms srcJarParms = new UserLibraryMemberItemSearchParms();
+		srcJarParms.setWorkspaceDir("C:/whennemuth/workspaces/kuali_workspace");
+		srcJarParms.setRootDir("C:/Users/wrh/.m2/repository/org/kuali/rice");
+		srcJarParms.setLibName("RICE_SOURCE_LIB_2.5.3.1509.0002");
+		srcJarParms.setRegex(".*2\\.5\\.3\\.1509\\.0002\\-kualico\\-((source(s)?)|(src(s)?))\\.jar");
+		srcJarParms.setIncludeSubDirs(true);		
+		parms.setSrcJarParms(srcJarParms);
 		
 		UserLibrary lib = getInstance(parms);
 		
 		for(UserLibraryMember m : lib.getLibMembers()) {
 			System.out.println(m.getJar().getAbsolutePath());
+			if(m.getSourceJar() != null) {
+				System.out.println(m.getSourceJar().getAbsolutePath());
+			}
+			System.out.println();
 		}
 		
-		if(true)
-			lib.save();
-		else
-			lib.preview();
+//		if(false)
+//			lib.save();
+//		else
+//			lib.preview();
 		
 		System.out.println("FINISH!");
 	}

@@ -1,6 +1,15 @@
 package com.warren.knickknacks.eclipse.jdt.core.prefs;
 
-
+/**
+ * This class represents a group of parameter sets for a single user library member.
+ * Any member of a user library, like a jar file for example, has 5 separate properties offered by eclipse:
+ *    1) The location of the jar
+ *    2) The location of the source code jar
+ *    3) The location of any native libraries
+ *    4) Access rules.
+ * @author wrh
+ *
+ */
 public class UserLibraryMemberSearchParms {
 
 	private UserLibraryMemberItemSearchParms jarParms;

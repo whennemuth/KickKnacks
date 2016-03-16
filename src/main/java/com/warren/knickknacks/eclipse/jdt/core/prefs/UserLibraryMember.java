@@ -4,6 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents a single member of an eclipse user library - a jar file, for example.
+ * @author wrh
+ *
+ */
 public class UserLibraryMember {
 
 	private File jar;
@@ -12,6 +17,7 @@ public class UserLibraryMember {
 	private File nativeLibrary;
 	private List<String> accessRules = new ArrayList<String>();
 	private File directory;
+	private UserLibrary parent;
 	
 	public File getJar() {
 		return jar;
@@ -48,5 +54,11 @@ public class UserLibraryMember {
 	}
 	public void setDirectory(File directory) {
 		this.directory = directory;
+	}
+	public UserLibrary getParent() {
+		return parent;
+	}
+	public void setParent(UserLibrary parent) {
+		this.parent = parent;
 	}
 }
