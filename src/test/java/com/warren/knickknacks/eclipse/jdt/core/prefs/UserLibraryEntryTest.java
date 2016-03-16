@@ -12,18 +12,24 @@ import org.mockito.Mockito;
 
 public class UserLibraryEntryTest extends AbstractTest{
 
-	List<File> items = new ArrayList<File>();
+	List<UserLibraryMember> members = new ArrayList<UserLibraryMember>();
 	
 	@Before
 	public void setUp() {		
-		items.add(configureFile("c:/mylib/lib1.jar", Mockito.mock(File.class)));
-		items.add(configureFile("c:/mylib/lib2.jar", Mockito.mock(File.class)));
-		items.add(configureDirectory("c:/mylib/libdir01", Mockito.mock(File.class)));
+		addUserLibraryMemberMock("c:/mylib/lib1.jar");
+		addUserLibraryMemberMock("c:/mylib/lib2.jar");
+		addUserLibraryMemberMock("c:/mylib/libdir01");
+	}
+	
+	private void addUserLibraryMemberMock(String pathname) {
+		UserLibraryMember member = new UserLibraryMember();
+		member.setJar(configureFile(pathname, Mockito.mock(File.class)));
+		members.add(member);
 	}
 	
 	@Test
 	public void testPrefsFileLine() {
-		UserLibraryEntry entry = new UserLibraryEntry(items);
+		UserLibraryString entry = new UserLibraryString(members);
 		String prefsLine = entry.getPrefsFileLine("NEW_LIB");
 		System.out.println(prefsLine);
 		assertTrue(prefsLine.startsWith(

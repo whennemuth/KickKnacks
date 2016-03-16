@@ -12,15 +12,15 @@ import java.io.PrintWriter;
 
 import com.warren.knickknacks.Util;
 
-public class PrefsFile {
+public class EclipsePrefsFile {
 
 	private File prefsFile;
 	
-	public PrefsFile(File prefsFile) {
+	public EclipsePrefsFile(File prefsFile) {
 		this.prefsFile = prefsFile;
 	}
 	
-	public PrefsFile(String pathname) {
+	public EclipsePrefsFile(String pathname) {
 		this(new File(pathname));
 	}
 

@@ -2,33 +2,64 @@ package com.warren.knickknacks.eclipse.jdt.core.prefs;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import com.warren.knickknacks.eclipse.jdt.core.prefs.UserLibraryMerger.ItemType;
 
 public class UserLibrary {
 	
 	public static final String ECLIPSE_SETTINGS_FILE = 
 			".metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.core.prefs";
 	
-	private List<File> libEntries = new ArrayList<File>();
-//	private File workspace;
-//	private String name;
-	private UserLibraryParms parms;
+	private List<UserLibraryMember> libMembers = new ArrayList<UserLibraryMember>();
+	private UserLibraryMemberItemSearchParms parms;
 	
-	public static UserLibrary getInstanceForJars(UserLibraryParms parms) {
+	public static UserLibrary getInstance(UserLibraryMemberSearchParms parms) {
+		
+		if(parms.getJarParms() == null) {
+			throw new IllegalArgumentException("Jar search parameters required!");
+		}
+
+		UserLibrary jarLib = getInstance(parms.getJarParms());
+		UserLibraryMerger merger = new UserLibraryMerger(jarLib);
+		
+		if(parms.getSrcJarParms() != null) {
+			UserLibrary srcJarLib = getInstance(parms.getSrcJarParms());
+			merger.merge(srcJarLib, ItemType.SRC_JAR);
+		}
+		
+		if(parms.getJavaDocParms() != null) {
+			UserLibrary javaDocLib = getInstance(parms.getJavaDocParms());
+			merger.merge(javaDocLib, ItemType.JAVADOC);
+		}
+		
+		if(parms.getNativeLibraryParms() != null) {
+			UserLibrary nativeLibLib = getInstance(parms.getNativeLibraryParms());
+			merger.merge(nativeLibLib, ItemType.NATIVE_LIB);
+		}
+		
+		if(parms.getAccessRulesParms() != null) {
+			UserLibrary accessRulesLib = getInstance(parms.getAccessRulesParms());
+			merger.merge(accessRulesLib, ItemType.ACCESS_RULES);
+		}
+
+		return merger.getMergedLib();
+	}
+	
+	public static UserLibrary getInstanceForJars(UserLibraryMemberItemSearchParms parms) {
 		parms.setRegex(".*\\.jar");
 		return getInstance(parms);
 	}
 	
-	public static UserLibrary getInstanceForSourceJars(UserLibraryParms parms) {
-		parms.setRegex(".*\\-((source)|(sources))\\.jar");
+	public static UserLibrary getInstanceForSourceJars(UserLibraryMemberItemSearchParms parms) {
+		parms.setRegex(".*\\-((source)|(sources)|(src)\\.jar");
 		return getInstance(parms);
 	}
 		
-	public static UserLibrary getInstance(final UserLibraryParms parms) {
+	public static UserLibrary getInstance(final UserLibraryMemberItemSearchParms parms) {
 		if(!parms.isValid()) 
 			throw new IllegalArgumentException(parms.getValidationMessage());
 		
@@ -43,6 +74,7 @@ public class UserLibrary {
 					return matcher.matches();
 				return true;
 			}});
+		
 		return lib;
 	}
 
@@ -54,7 +86,9 @@ public class UserLibrary {
 				build(f, filter);
 			}
 			else {
-				libEntries.add(f);
+				UserLibraryMember member = new UserLibraryMember();
+				member.setJar(f);
+				libMembers.add(member);
 			}
 		}
 	}
@@ -79,8 +113,8 @@ public class UserLibrary {
 	 * @throws Exception
 	 */
 	public void save() throws Exception {
-		UserLibraryEntry entry = new UserLibraryEntry(libEntries);
-		PrefsFile prefsFile = new PrefsFile(getPreferencesPathname());
+		UserLibraryString entry = new UserLibraryString(libMembers);
+		EclipsePrefsFile prefsFile = new EclipsePrefsFile(getPreferencesPathname());
 		String lineItem = entry.getPrefsFileLine(parms.getLibName());
 		if(lineItem.isEmpty()) 
 			return;
@@ -88,8 +122,8 @@ public class UserLibrary {
 	}
 
 	public String getPreview() throws Exception {
-		UserLibraryEntry entry = new UserLibraryEntry(libEntries);
-		PrefsFile prefsFile = new PrefsFile(getPreferencesPathname());
+		UserLibraryString entry = new UserLibraryString(libMembers);
+		EclipsePrefsFile prefsFile = new EclipsePrefsFile(getPreferencesPathname());
 		String lineItem = entry.getPrefsFileLine(parms.getLibName());
 		if(lineItem.isEmpty()) 
 			return "[NO CONTENT FOUND TO COMPOSE A LIBRARY FROM]";
@@ -107,18 +141,14 @@ public class UserLibrary {
 		preview(System.out);
 	}
 	
-//	public String getName() {
-//		return name;
-//	}
-	
-	public List<File> getLibEntries() {
-		return libEntries;
+	public List<UserLibraryMember> getLibMembers() {
+		return libMembers;
 	}
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("START!");
 		
-		UserLibraryParms parms = new UserLibraryParms();
+		UserLibraryMemberItemSearchParms parms = new UserLibraryMemberItemSearchParms();
 		parms.setWorkspaceDir("C:/whennemuth/workspaces/kuali_workspace");
 		parms.setRootDir("C:/Users/wrh/.m2/repository/org/kuali/rice");
 		parms.setLibName("RICE_SOURCE_LIB_2.5.3.1509.0002");
@@ -127,8 +157,8 @@ public class UserLibrary {
 		
 		UserLibrary lib = getInstance(parms);
 		
-		for(File f : lib.getLibEntries()) {
-			System.out.println(f.getAbsolutePath());
+		for(UserLibraryMember m : lib.getLibMembers()) {
+			System.out.println(m.getJar().getAbsolutePath());
 		}
 		
 		if(true)

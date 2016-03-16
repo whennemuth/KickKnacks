@@ -4,16 +4,15 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UserLibraryParms {
+public class UserLibraryMemberItemSearchParms {
 
+	private String libName;
 	private String workspace;
 	private File workspaceDir;
-	private String root;
+	private String rootDirPathname;
 	private File rootDir;
-	private Boolean includeSubDirs;
-	private String regex;
+	private Boolean includeSubDirs;	
 	private Pattern pattern;
-	private String libName;
 	
 	public static final String VALID = "All parameters are valid";
 	
@@ -25,23 +24,25 @@ public class UserLibraryParms {
 		StringBuilder s = new StringBuilder();
 		if(workspace == null || !workspaceDir.isDirectory())
 			s.append("Invalid workspace directory: " + workspace + "\r\n");
-		if(root == null || !rootDir.isDirectory())
-			s.append("Invalid root directory: " + root + "\r\n");
+		if(rootDirPathname == null || !rootDir.isDirectory())
+			s.append("Invalid root directory: " + rootDirPathname + "\r\n");
 		if(includeSubDirs == null)
 			s.append("Include subdirectories not specified\r\n");
 		if(libName == null)
 			s.append("Library name not specified\r\n");
 		if(s.length() == 0) {
 			s.append(VALID);
-		}
+		}		
 		else {
 			s.insert(0, "WARNING - INVALID PARAMETERS: \r\n");
 		}
 		return s.toString();
 	}
+	
 	public boolean isValid() {
 		return VALID.equals(getValidationMessage());
 	}
+	
 	public File getWorkspaceDir() {
 		return workspaceDir;
 	}
@@ -53,7 +54,7 @@ public class UserLibraryParms {
 		return rootDir;
 	}
 	public void setRootDir(String root) {
-		this.root = root;
+		this.rootDirPathname = root;
 		this.rootDir = new File(root);
 	}
 	public Boolean getIncludeSubDirs() {
@@ -68,7 +69,6 @@ public class UserLibraryParms {
 		return pattern.matcher(s);
 	}
 	public void setRegex(String regex) {
-		this.regex = regex;
 		this.pattern = Pattern.compile(regex);
 	}
 	public String getLibName() {

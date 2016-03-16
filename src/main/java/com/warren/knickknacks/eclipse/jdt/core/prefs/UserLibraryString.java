@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.warren.knickknacks.Util;
 
-public class UserLibraryEntry {
+public class UserLibraryString {
 
-	private List<File> items;
+	private List<UserLibraryMember> members;
 	
-	public UserLibraryEntry(List<File> items) {
-		this.items = items;
+	public UserLibraryString(List<UserLibraryMember> members) {
+		this.members = members;
 	}
 
 	/**
@@ -21,7 +21,7 @@ public class UserLibraryEntry {
 	 * @return
 	 */
 	public String getPrefsFileLine(String libName) {
-		if(items == null || items.isEmpty()) {
+		if(members == null || members.isEmpty()) {
 			return "";
 		}
 		
@@ -30,9 +30,9 @@ public class UserLibraryEntry {
 				.append("=<?xml version\\=\"1.0\" encoding\\=\"UTF-8\"?>\\r\\n")
 				.append("<userlibrary systemlibrary\\=\"false\" version\\=\"2\">");
 		
-		for(File f : items) {
+		for(UserLibraryMember m : members) {
 			s.append("\\r\\n\\t<archive path\\=\"");
-			String path = getPath(f);
+			String path = getPath(m.getJar());
 			s.append(path);
 			s.append("\"/>");
 		}
