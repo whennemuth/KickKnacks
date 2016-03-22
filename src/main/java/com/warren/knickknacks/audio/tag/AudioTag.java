@@ -1,64 +1,55 @@
 package com.warren.knickknacks.audio.tag;
 
+import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.id3.AbstractID3Tag;
 import org.jaudiotagger.tag.id3.ID3v1Tag;
 
 import com.warren.knickknacks.audio.AudioFile;
 
 public abstract class AudioTag {
-	private AudioFile audioFile;
-	private Tag tag;
+	protected AudioFile audioFile;
+	protected Tag tag;
 	
-	private String title;
-	private String artist;
-	private String album;
-	private String year;
-	private String comment;
-	private String genre;
-	
-	private AudioTag() { /* Restrict default constructor */ }
+	protected String title;
+	protected String artist;
+	protected String album;
+	protected String year;
+	protected String comment;
+	protected String genre;
 	
 	public static AudioTag getInstance(final AudioFile audioFile) throws Exception {
-		AudioTag audioTag = new AudioTag(){
-			@Override public void save(AudioTag audioTag) throws Exception {
-				switch(audioFile.getAudioFileType()) {
-					case MP3:
-						ID3v1Tag mp3Tag = (ID3v1Tag) audioTag.getTag();
-						mp3Tag.setAlbum(audioTag.album);
-						mp3Tag.setArtist(audioTag.artist);
-						mp3Tag.setComment(audioTag.comment);
-						mp3Tag.setGenre(audioTag.genre);
-						mp3Tag.setTitle(audioTag.title);
-						mp3Tag.setYear(audioTag.year);
-						//mp3Tag.createStructure();
-						audioFile.save();
-						break;
-					default:
-						throw new UnsupportedOperationException("TODO: Not done yet");
-				}
-			}};
-			
-		audioTag.audioFile = audioFile;
 		
+		AudioTag audioTag = null;
 		switch(audioFile.getAudioFileType()) {
 			case MP3:
-				org.jaudiotagger.audio.mp3.MP3File mp3 = new org.jaudiotagger.audio.mp3.MP3File(audioFile.getFile());
-				audioTag.tag = mp3.getID3v1Tag();
+				audioTag = new MP3AudioTag((MP3File) audioFile.getAudioFile());
 				break;
 			default:
-				org.jaudiotagger.audio.AudioFile audio = new org.jaudiotagger.audio.AudioFile();
-				audio.setFile(audioFile.getFile());
-				audioTag.tag = audio.getTagOrCreateDefault();
-				break;
+				throw new UnsupportedOperationException("TODO: Not done yet");
+		}
+			
+		audioTag.audioFile = audioFile;
+		audioTag.tag = audioFile.getAudioFile().getTag();
+		
+		if(audioTag.tag == null) {
+			switch(audioFile.getAudioFileType()) {
+				case MP3:
+					// MP3File mp3 = new MP3File(audioFile.getFile());
+					// audioTag.tag = mp3.getID3v1Tag();
+					// break;
+					throw new IllegalArgumentException("No ID3 tag has been set");
+				default:
+					org.jaudiotagger.audio.AudioFile audio = new org.jaudiotagger.audio.AudioFile();
+					audio.setFile(audioFile.getFile());
+					audioTag.tag = audio.getTagOrCreateDefault();
+					break;
+			}
 		}
 		return audioTag;
 	}
 	
-	public void save() throws Exception {
-		save(this);
-	}
-	
-	abstract void save(AudioTag tagToSave) throws Exception;
+	public abstract void save() throws Exception;
 	
 	@Override
 	public String toString() {

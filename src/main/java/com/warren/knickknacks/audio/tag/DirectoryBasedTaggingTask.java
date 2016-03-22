@@ -10,12 +10,16 @@ public class DirectoryBasedTaggingTask extends AbstractAudioTask {
 
 	@Override
 	public void performTask(AudioFile audioFile) throws Exception {
-		AudioTag tag = audioFile.getTag();
 		String artist = audioFile.getFile().getParentFile().getParentFile().getName();
-		String title = audioFile.getFile().getParentFile().getName();
-		tag.setArtist(artist);
-		tag.setTitle(title);
-		tag.save();
+		String album = audioFile.getFile().getParentFile().getName();
+		if(!artist.matches("LRH \\d+: .*")) {
+			if(artist.matches("\\d+\\s+.*")) {
+				artist = "LRH " + artist.split("\\s+")[0] + ": " + artist.replaceFirst("\\d+\\s+", "");
+			}			
+		}
+		audioFile.setArtist(artist);
+		audioFile.setAlbum(album);
+		audioFile.save();
 	}
 
 	public void tagAll(File rootDir) throws Exception {
@@ -28,5 +32,11 @@ public class DirectoryBasedTaggingTask extends AbstractAudioTask {
 				return (includeSubDirs && pathname.isDirectory()) || 
 						pathname.getName().toLowerCase().endsWith(".mp3");
 			}});
+	}
+	
+	public static void main(String[] args) throws Exception {
+		DirectoryBasedTaggingTask task = new DirectoryBasedTaggingTask();
+		File rootDir = new File("C:/directory/with/mp3/files/in/it");
+		task.tagAllMp3(rootDir, true);
 	}
 }

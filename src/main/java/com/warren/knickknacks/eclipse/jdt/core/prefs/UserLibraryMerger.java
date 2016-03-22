@@ -6,8 +6,8 @@ import java.util.Arrays;
 /**
  * A user library can be related to another user library.
  * For example, user library A constitutes a collection of jars, and user library B constitutes a collection of source jars.
- * A relates to be in that each jar in A has a matching jar in B, where jar in B contains the source code for the jar in A.
- * This class "merges" one user library into another such that a pairing is set reflecting the relationship.
+ * A relates to be in that each jar in A has a matching jar in B, where the jar in B contains the source code for the jar in A.
+ * This class "merges" one user library into another such that a pairing is set reflecting that relationship.
  * Before the merge, the following would be seen:
  *     A.getLibMembers().get(n).getJar() = [The main jar]
  *     A.getLibMembers().get(n).getSourceJar() = null
@@ -102,15 +102,15 @@ public abstract class UserLibraryMerger {
 	/**
 	 * The existing user library member may already have had an item - like source jar, javadoc, etc. - set.
 	 * But this would have been based off that item starting with the same name as the main jar (minus the file extension).
-	 * It is possible that the new candidate fits this same criteria with a shorter name, which would make it a more
-	 * accurate match. In this case, the candidate replaces the existing (or null) and is therefore "mergeable".
+	 * It is possible that the new candidate fits this same criteria with a longer name, which would make it a more
+	 * accurate match. In this case, the candidate can replace the existing (or null) item and is therefore "mergeable".
 	 *  
 	 * @param existing
 	 * @param anotherCandidate
 	 * @return
 	 */
 	private boolean isMergeable(File existing, File anotherCandidate) {
-		return existing == null || existing.getName().length() > anotherCandidate.getName().length();
+		return existing == null || existing.getName().length() < anotherCandidate.getName().length();
 	}
 	
 	public UserLibrary getMergedLib() {

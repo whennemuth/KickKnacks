@@ -17,14 +17,15 @@ public class AudioFile {
 		this.file = file;
 		audioFileType = AudioFileType.getType(file);
 		switch(audioFileType) {
-		case MP3:
-			this.audioFile = new MP3File(file);
-			break;
-		default:
-			// TODO: There are many other types supported by the jaudiotagger library.
-			this.audioFile = (org.jaudiotagger.audio.AudioFile) audioFileType.getType().newInstance();
-			this.audioFile.setFile(file);
+			case MP3:
+				this.audioFile = new MP3File(file);
+				break;
+			default:
+				// TODO: There are many other types supported by the jaudiotagger library.
+				this.audioFile = (org.jaudiotagger.audio.AudioFile) audioFileType.getType().newInstance();
+				this.audioFile.setFile(file);
 		}
+		getTag();
 	}
 
 	public AudioTag getTag() {
@@ -32,7 +33,8 @@ public class AudioFile {
 			if(audioTag == null)
 				audioTag = AudioTag.getInstance(this);
 			return audioTag;
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -47,7 +49,34 @@ public class AudioFile {
 	}
 	
 	public void save() throws Exception {
+		if(audioTag != null) {
+			audioTag.save();
+			audioFile.setTag(audioTag.getTag());
+		}
 		audioFile.commit();
+	}
+
+	public org.jaudiotagger.audio.AudioFile getAudioFile() {
+		return audioFile;
+	}
+
+	public void setTitle(String title) {
+		getTag().setTitle(title);
+	}
+	public void setArtist(String artist) {
+		getTag().setArtist(artist);
+	}
+	public void setAlbum(String album) {
+		getTag().setAlbum(album);
+	}
+	public void setYear(String year) {
+		getTag().setYear(year);
+	}
+	public void setComment(String comment) {
+		getTag().setComment(comment);
+	}
+	public void setGenre(String genre) {
+		getTag().setGenre(genre);
 	}
 
 	@Override
@@ -63,9 +92,21 @@ public class AudioFile {
 	}
 
 	public static void main(String[] args) throws Exception {
-		File f = new File("C:/myNonTechnicalStuff/multimedia/Audio/lectures/01 Science of Survival/08 Chart of Human Evaluation, Part 1/19. CD Track 19.mp3");
+		final String filepath = "C:/path/to/mp3/track1.mp3";
+		System.out.println("Starting for \"" + filepath + "\"");
+		File f = new File(filepath);
 		AudioFile audioFile = new AudioFile(f);
-		System.out.println(audioFile);
-		System.out.println(audioFile.audioFile.displayStructureAsPlainText());
+//		System.out.println(audioFile);
+//		System.out.println(audioFile.audioFile.displayStructureAsPlainText());
+		
+//		audioFile.setAlbum("ALBUM NAME");
+		audioFile.setArtist("ARTIST NAME");
+//		audioFile.setComment("MY COMMENT");
+//		audioFile.setGenre("GENRE NAME");
+//		audioFile.setTitle("TITLE ENTRY");
+//		audioFile.setYear("YEAR ENTRY");
+		audioFile.save();
+		
+		System.out.println("Finished");
 	}
 }

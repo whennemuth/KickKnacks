@@ -5,6 +5,13 @@ import java.util.List;
 
 import com.warren.knickknacks.Util;
 
+/**
+ * This class builds a single line item in the eclipse preferences file containing the user libraries for the workspace.
+ * This line item represent a single user library as it would appear as text within the file.
+ * 
+ * @author Warren
+ *
+ */
 public class UserLibraryString {
 
 	private List<UserLibraryMember> members;

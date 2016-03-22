@@ -23,6 +23,7 @@ public abstract class AbstractAudioTask {
 			}
 			else {
 				AudioFile audioFile = new AudioFile(f);
+				System.out.println("Performing task for: " + audioFile.getFile().getAbsolutePath());
 				performTask(audioFile);
 			}
 		}

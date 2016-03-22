@@ -4,6 +4,14 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This file represents the parameters for conducting a search.
+ * The search starts in a top level directory for files whose name match a specified pattern and are to be
+ * included as part of an eclipse user library of a specified name.
+ * 
+ * @author Warren
+ *
+ */
 public class UserLibraryMemberItemSearchParms {
 
 	private String libName;

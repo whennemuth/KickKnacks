@@ -128,4 +128,17 @@ public class Util {
 		return s.toString();
 	}
 	
+	public static boolean isEmpty(String s) {
+		if(s == null)
+			return true;
+		if(s.isEmpty())
+			return true;
+		if(s.trim().isEmpty())
+			return true;
+		return false;
+	}
+	
+	public static boolean hasValue(String s) {
+		return !isEmpty(s);
+	}
 }
